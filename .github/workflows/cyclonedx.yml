@@ -1,0 +1,37 @@
+name: CycloneDX Generate
+
+on:
+  push:
+    branches: [ data ]
+  pull_request:
+    branches: [ data ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+    - name: Generate CycloneDX files
+      run: |
+        python cyclonedx-generate.py
+    - name: Check for changes
+      id: git-check
+      run: |
+        git diff --exit-code cryptography-curves.json cryptography-curves.schema.json || echo "::set-output name=modified::true"
+    - name: Commit changes if needed
+      if: steps.git-check.outputs.modified == 'true' && github.event_name == 'push'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add cryptography-curves.json cryptography-curves.schema.json
+        git commit -m "Update CycloneDX files [skip ci]"
+        git push
