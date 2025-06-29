@@ -35,6 +35,8 @@ def main():
 
     # Initialize the summary structure
     summary = {
+        "$schema": "http://cyclonedx.org/schema/cryptography-curves.schema.json",
+        "$id": "http://cyclonedx.org/schema/cryptography-curves.json",
         "name": "CycloneDX Cryptography: Standard Curves",
         "description": "Information for standard elliptic curves from various categories.",
         "categories": []
